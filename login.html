@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glass Login</title>
+
+    <!-- Tailwind -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+
+<body class="min-h-screen flex items-center justify-center font-sans relative">
+<!-- BACKGROUND IMAGE -->
+<div class="absolute inset-0 -z-10">
+    <img 
+        src="img/ava.jpg"
+        alt="Background"
+        class="w-full h-full object-cover"
+    >
+    <!-- overlay biar glass keliatan -->
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-sm"></div>
+</div>
+
+
+    <!-- GLASS CARD -->
+    <div class="flex w-full max-w-4xl rounded-2xl overflow-hidden
+    bg-white/20 backdrop-blur-xl border border-white/30 shadow-2xl">
+
+        <!-- BAGIAN GAMBAR -->
+        <div class="w-1/2 hidden md:block relative">
+            <img 
+                src="img/wall.jpeg"
+                alt="Login Image"
+                class="h-full w-full object-cover"
+            >
+            <!-- overlay glass -->
+            <div class="absolute inset-0 bg-black/30 backdrop-blur-sm"></div>
+        </div>
+
+        <!-- BAGIAN FORM -->
+        <div class="w-full md:w-1/2 p-10 text-white bg-white/10 backdrop-blur-lg">
+
+            <div class="text-center mb-8">
+                <h2 class="text-3xl font-bold">Welcome Back</h2>
+                <p class="text-white/70">Please login to your account</p>
+            </div>
+
+            <form onsubmit="return validateLogin()" class="space-y-6">
+
+                <!-- USERNAME -->
+                <div>
+                    <label class="block mb-2 text-sm">Username</label>
+                    <div class="relative">
+                        <input
+                            type="text"
+                            id="username"
+                            placeholder="Enter your username"
+                            class="w-full pl-10 pr-4 py-3 rounded-md
+                            bg-white/20 backdrop-blur
+                            border border-white/30
+                            text-white placeholder-white/70
+                            focus:outline-none focus:ring-2 focus:ring-white"
+                            required
+                        >
+                        <i class="fas fa-user absolute left-3 top-3 text-white/70"></i>
+                    </div>
+                </div>
+
+                <!-- PASSWORD -->
+                <div>
+                    <label class="block mb-2 text-sm">Password</label>
+                    <div class="relative">
+                        <input
+                            type="password"
+                            id="password"
+                            placeholder="Enter your password"
+                            class="w-full pl-10 pr-10 py-3 rounded-md
+                            bg-white/20 backdrop-blur
+                            border border-white/30
+                            text-white placeholder-white/70
+                            focus:outline-none focus:ring-2 focus:ring-white"
+                            required
+                        >
+                        <i class="fas fa-lock absolute left-3 top-3 text-white/70"></i>
+
+                        <button 
+                            type="button"
+                            onclick="togglePassword()"
+                            class="absolute right-3 top-3 text-white/70 hover:text-white"
+                        >
+                            <i id="eye-icon" class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- REMEMBER & FORGOT -->
+                <div class="flex justify-between items-center text-sm">
+                    <label class="flex items-center">
+                        <input type="checkbox" id="remember" class="mr-2">
+                        Remember me
+                    </label>
+                    <a href="#" class="hover:underline">Forgot password?</a>
+                </div>
+
+                <!-- BUTTON -->
+                <button
+                    type="submit"
+                    id="login-btn"
+                    class="w-full py-3 rounded-md
+                    bg-white/80 text-purple-700 font-semibold
+                    hover:bg-white transition"
+                >
+                    <i class="fas fa-sign-in-alt mr-2"></i>Login
+                </button>
+
+                <p id="error" class="text-center text-red-300 text-sm hidden">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    Username or password is incorrect
+                </p>
+            </form>
+        </div>
+
+    </div>
+
+    <script>
+        function togglePassword() {
+            const password = document.getElementById("password");
+            const eyeIcon = document.getElementById("eye-icon");
+            if (password.type === "password") {
+                password.type = "text";
+                eyeIcon.className = "fas fa-eye-slash";
+            } else {
+                password.type = "password";
+                eyeIcon.className = "fas fa-eye";
+            }
+        }
+
+        function validateLogin() {
+            const username = document.getElementById("username").value.trim();
+            const password = document.getElementById("password").value.trim();
+            const error = document.getElementById("error");
+            const loginBtn = document.getElementById("login-btn");
+            const remember = document.getElementById("remember").checked;
+
+            error.classList.add("hidden");
+
+            const users = [{ username: "admin", password: "123" }];
+
+            const foundUser = users.find(
+                user => user.username === username && user.password === password
+            );
+
+            if (foundUser) {
+                loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i>Logging in...';
+                loginBtn.disabled = true;
+
+                setTimeout(() => {
+                    localStorage.setItem("auth", JSON.stringify({
+                        islogin: true,
+                        user: foundUser.username,
+                        remember: remember
+                    }));
+                    window.location.href = "data.html";
+                }, 1000);
+            } else {
+                error.classList.remove("hidden");
+            }
+            return false;
+        }
+
+        window.onload = function () {
+            const auth = JSON.parse(localStorage.getItem("auth"));
+            if (auth && auth.remember) {
+                document.getElementById("username").value = auth.user;
+                document.getElementById("remember").checked = true;
+            }
+        };
+    </script>
+
+</body>
+</html>
